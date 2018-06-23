@@ -1,0 +1,6 @@
+node_modules/
+node-chat-app.njsproj
+package-lock.json
+bin/
+obj/
+
