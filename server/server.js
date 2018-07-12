@@ -24,6 +24,11 @@ io.on('connection', (socket) => {
             return callback('Name and Room are required!');
         }
 
+        var dupUser = users.users.filter((user) => user.name.toLowerCase() === params.name.toLowerCase())[0];
+        if (dupUser) {
+            return callback('Username allready in use');
+        }
+
         socket.join(params.room);
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
