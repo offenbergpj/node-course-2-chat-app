@@ -14,7 +14,11 @@ function scrollToBottom() {
     if (clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight) {
         messages.scrollTop(scrollHeight);
     }
-} 
+}; 
+
+function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+};
 
 socket.on('connect', function () {
     var params = jQuery.deparam(window.location.search);
@@ -25,6 +29,7 @@ socket.on('connect', function () {
             alert(err);
             window.location.href = '/';
         } else {
+            document.title = `${capitalizeFirstLetter(params.room)} | ChatApp`;
             console.log('No error');
         }
     });
@@ -100,3 +105,4 @@ locationButton.on('click', function () {
         alert('Unable to fetch location.');
     })
 });
+

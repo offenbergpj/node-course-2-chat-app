@@ -16,23 +16,36 @@ var users = new Users();
 
 app.use(express.static(publicPath, { index: 'index.html' }))
 
+app.get('/rooms', (req, res) => {
+    var availableRooms = [];
+    var rooms = io.sockets.adapter.rooms;
+    if (rooms) {
+        for (var room in rooms) {
+            if (!rooms[room].sockets.hasOwnProperty(room)) {
+                availableRooms.push(room);
+            }
+        }
+    }
+    res.send(availableRooms);
+});
+
 io.on('connection', (socket) => {
-    console.log('New user connected');
 
     socket.on('join', (params, callback) => {
+
+        params.room = params.room.toLowerCase(); 
+
         if (!isRealString(params.name) || !isRealString(params.room)) {
             return callback('Name and Room are required!');
         }
 
-        var dupUser = users.users.filter((user) => user.name.toLowerCase() === params.name.toLowerCase())[0];
-        if (dupUser) {
-            return callback('Username allready in use');
+        if (users.isNameTaken(params.name, params.room)) {
+            return callback('Name already taken.');
         }
 
         socket.join(params.room);
         users.removeUser(socket.id);
         users.addUser(socket.id, params.name, params.room);
-
         io.to(params.room).emit('updateUserList', users.getUserList(params.room));
 
         socket.emit('newMessage', generateMessage('Admin', 'Welcome to the chat app'));
